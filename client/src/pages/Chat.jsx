@@ -4,8 +4,7 @@ import { io } from "socket.io-client";
 
 let typingTimer;
 
-const socket = io("http://localhost:8000");
-
+const socket = io("https://chatsphere-backend-518s.onrender.com");
 
 function Chat() {
 
@@ -33,7 +32,7 @@ const messagesEndRef = useRef(null);
 useEffect(() => {
 
 
-    fetch("http://localhost:8000/api/users")
+    fetch("https://chatsphere-backend-518s.onrender.com/api/users")
     .then(res => res.json())
     .then(data => {
       console.log("Users:", data.users);
@@ -129,7 +128,7 @@ useEffect(() => {
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
   fetch(
-    `http://localhost:8000/api/messages/${currentUser.id}/${selectedUser._id}`
+    `https://chatsphere-backend-518s.onrender.com/api/messages/${currentUser.id}/${selectedUser._id}`
   )
     .then((res) => res.json())
     .then((data) => {
