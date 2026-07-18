@@ -25,7 +25,7 @@ function Signup() {
 
     try {
       const res = await fetch(
-        "https://chatsphere-backend-518s.onrender.com/api/auth/register"
+        "https://chatsphere-backend-518s.onrender.com/api/auth/register",
         {
           method: "POST",
           headers: {

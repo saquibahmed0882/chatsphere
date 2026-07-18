@@ -25,7 +25,7 @@ function Login() {
     try {
 
       const res = await fetch(
-        "https://chatsphere-backend-518s.onrender.com/api/auth/login"
+        "https://chatsphere-backend-518s.onrender.com/api/auth/login",
         {
           method: "POST",
           headers: {
