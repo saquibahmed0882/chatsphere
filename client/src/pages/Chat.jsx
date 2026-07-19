@@ -27,6 +27,8 @@ function Chat() {
     }
   ]);
 
+const [replyMessage, setReplyMessage] = useState(null);
+
 const messagesEndRef = useRef(null);
 
 useEffect(() => {
@@ -163,14 +165,11 @@ useEffect(() => {
 
     const user = JSON.parse(localStorage.getItem("user"));
     
-    const newMessage = {
-      
+    const newMessage = { 
       sender: user.id,     
-
       receiver: selectedUser._id,
-     
-      text: message
-
+      text: message,
+      replyTo: replyMessage ? replyMessage._id : null
     };
 
     console.log("Sending:", newMessage);
@@ -184,7 +183,8 @@ useEffect(() => {
     console.log("Socket Connected:", socket.connected);
 
     setMessage("");
-
+    setReplyMessage(null);  
+ 
   };
 
 
@@ -276,6 +276,15 @@ useEffect(() => {
 
               {msg.text}
               
+              <div className="mt-2">
+                <button
+                  onClick={() => setReplyMessage(msg)}
+                  className="bg-blue-600 text-white px-3 py-1 rounded mt-2"
+                >
+                   Reply
+                </button>
+              </div>
+
               {msg.createdAt && (
                 <div className="text-xs text-gray-200 mt-1">
                   {new Date(msg.createdAt).toLocaleTimeString([], {
@@ -310,6 +319,25 @@ useEffect(() => {
 
         <div className="bg-gray-900 p-5 flex gap-3">
 
+            {replyMessage && (
+              <div className="bg-gray-800 p-3 rounded-lg border-l-4 border-blue-500">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-xs text-blue-400">Replying to</p>
+                    <p className="text-sm text-white">{replyMessage.text}</p>
+                  </div>
+
+                  <button
+                    onClick={() => setReplyMessage(null)}
+                    className="text-red-500 font-bold"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            )}
+
+           <div className="flex gap-3">
 
             <input
     
@@ -353,18 +381,11 @@ useEffect(() => {
           >          
             Send
           </button>
-
-
         </div>
-
-
       </div>
-
-
     </div>
-
-  );
-
+  </div>
+);
 }
 
 
