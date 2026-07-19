@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="screenshots/banner.png" alt="ChatSphere Banner" width="100%">
-</p>
-
 <h1 align="center">💬 ChatSphere</h1>
 
 <h3 align="center">
@@ -13,13 +9,17 @@ A modern <b>Full Stack Real-Time Chat Application</b> inspired by <b>iMessage</b
 </p>
 
 <p align="center">
+  <img src="screenshots/banner.png" alt="ChatSphere Banner" width="100%">
+</p>
+
+<p align="center">
 
 <a href="https://chatsphere-pi.vercel.app">
-  <img src="https://img.shields.io/badge/🌐_Live_Demo-Vercel-black?style=for-the-badge&logo=vercel">
+<img src="https://img.shields.io/badge/🌐_Live_Demo-Vercel-black?style=for-the-badge&logo=vercel">
 </a>
 
 <a href="https://chatsphere-backend-518s.onrender.com">
-  <img src="https://img.shields.io/badge/⚙️_Backend-Render-46E3B7?style=for-the-badge&logo=render">
+<img src="https://img.shields.io/badge/⚙️_Backend-Render-46E3B7?style=for-the-badge&logo=render">
 </a>
 
 <img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react">
@@ -29,6 +29,7 @@ A modern <b>Full Stack Real-Time Chat Application</b> inspired by <b>iMessage</b
 <img src="https://img.shields.io/badge/JWT-Authentication-orange?style=for-the-badge">
 
 </p>
+
 
 ---
 
