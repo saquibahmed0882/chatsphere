@@ -128,7 +128,25 @@ npm run dev
 
 ## 📸 Screenshots
 
-Screenshots will be added soon.
+### 🔐 Login Page
+
+![Login](screenshots/login.png)
+
+### 📝 Signup Page
+
+![Signup](screenshots/signup.png)
+
+### 💬 Chat Interface
+
+![Chat](screenshots/chat.png)
+
+### 🟢 Online Users
+
+![Online Users](screenshots/online-users.png)
+
+### ⌨️ Typing Indicator
+
+![Typing](screenshots/typing.png)
 
 ---
 
