@@ -16,9 +16,14 @@ const messageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-     status:{
-        type:String,
-        default:"sent"
+    replyTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Message",
+      default: null,
+    },    
+    status:{
+      type:String,
+      default:"sent"
     },
   },
   {

@@ -65,21 +65,30 @@ io.on("connection", (socket) => {
         sender: message.sender,
         text: message.text,
         receiver: message.receiver,
+        replyTo: message.replyTo || null,
         status: "sent"
       });
 
+      const populatedMessage = await Message.findById(savedMessage._id)
+        .populate("replyTo");
 
-    console.log("✅ Saved:", savedMessage);
+
+    console.log("✅ Saved:", populatedMessage);
 
     io.to(message.receiver).emit(
       "receiveMessage",
-      savedMessage
+      populatedMessage
+    );
+
+    io.to(message.sender).emit(
+      "receiveMessage",
+      populatedMessage
     );
 
     io.to(message.sender).emit(
       "messageDelivered",
       {
-        messageId: savedMessage._id
+        messageId: populatedMessage._id
        }
     );
 
