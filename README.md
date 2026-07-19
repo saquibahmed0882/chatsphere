@@ -1,6 +1,6 @@
 # 💬 ChatSphere
 
-A modern **real-time chat application** built using the **MERN Stack** and **Socket.IO**. ChatSphere provides secure authentication, instant messaging, online user status, typing indicators, and persistent chat history with a clean and responsive interface.
+A modern **Full Stack Real-Time Chat Application** inspired by **iMessage**, built using the **MERN Stack**, **Socket.IO**, **JWT Authentication**, and **MongoDB**.
 
 ---
 
@@ -17,6 +17,17 @@ A modern **real-time chat application** built using the **MERN Stack** and **Soc
 - 🌐 MongoDB Database
 
 ---
+
+## 🚀 Live Demo
+
+- **Frontend:** https://chatsphere-pi.vercel.app
+- **Backend API:** https://chatsphere-backend-518s.onrender.com
+
+## ☁️ Deployment
+
+- **Frontend:** Vercel
+- **Backend:** Render
+- **Database:** MongoDB Atlas
 
 ## 🛠 Tech Stack
 
