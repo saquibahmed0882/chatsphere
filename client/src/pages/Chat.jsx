@@ -350,9 +350,10 @@ useEffect(() => {
               <button
                 type="button"
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="bg-red-600 text-white px-6 py-3 rounded"
+                className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg transition text-2xl"
+                title="Choose Emoji"
               >
-                TEST BUTTON
+                😊
               </button>
 
               {showEmojiPicker && (
