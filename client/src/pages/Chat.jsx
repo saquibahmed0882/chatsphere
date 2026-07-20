@@ -5,7 +5,7 @@ import EmojiPicker from "emoji-picker-react";
 
 let typingTimer;
 
-const socket = io("https://chatsphere-backend-518s.onrender.com");
+const socket = io("http://localhost:8000");
 
 function Chat() {
 
@@ -31,6 +31,7 @@ function Chat() {
   ]);
 
 const [replyMessage, setReplyMessage] = useState(null);
+const [selectedMessage, setSelectedMessage] = useState(null);
 
 const messagesEndRef = useRef(null);
 
@@ -206,8 +207,49 @@ useEffect(() => {
 
   };
 
-  return (
+  const deleteForEveryone = async () => {
+    if (!selectedMessage) return;
 
+    await fetch(
+      "http://localhost:8000/api/messages/delete-for-everyone",
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messageId: selectedMessage._id,
+        }),
+      }
+    );
+
+    setSelectedMessage(null);
+  };
+
+  const deleteForMe = async () => {
+    if (!selectedMessage) return;
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    await fetch(
+      "http://localhost:8000/api/messages/delete-for-me",
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messageId: selectedMessage._id,
+          userId: user.id,
+        }),
+      }
+    );
+
+    setSelectedMessage(null);
+  };  
+
+  return (
+    <>
       <div className="min-h-screen bg-gray-950 text-white flex">
 
       <div className="w-72 bg-gray-900 p-6 border-r border-gray-800">
@@ -289,6 +331,13 @@ useEffect(() => {
                   className="bg-blue-600 text-white px-3 py-1 rounded mt-2"
                 >
                    Reply
+                </button>
+     
+                <button
+                  onClick={() => setSelectedMessage(msg)}
+                  className="bg-red-600 text-white px-3 py-1 rounded mt-2 ml-2"
+                >
+                  Delete
                 </button>
               </div>
 
@@ -409,8 +458,43 @@ useEffect(() => {
       </div>
     </div>
   </div>
-);
-}
+
+    {selectedMessage && (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg w-80 text-black">
+
+        <h2 className="text-xl font-bold mb-4">
+          Delete Message
+        </h2>
+
+        <button
+          onClick={deleteForEveryone}
+          className="w-full bg-red-600 text-white py-2 rounded mb-2"
+        >
+          Delete for Everyone
+        </button>
+
+        <button
+          onClick={deleteForMe}
+          className="w-full bg-yellow-500 text-white py-2 rounded mb-2"
+        >
+          Delete for Me
+        </button>
+
+        <button
+          onClick={() => setSelectedMessage(null)}
+          className="w-full bg-gray-500 text-white py-2 rounded"
+        >
+          Cancel
+        </button>
+
+      </div>
+    </div>
+  )}
+
+  </>
+ );
+ }
 
 
-export default Chat;
+ export default Chat;
