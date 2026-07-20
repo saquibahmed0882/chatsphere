@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
+import EmojiPicker from "emoji-picker-react";
 
 let typingTimer;
 
@@ -11,6 +12,8 @@ function Chat() {
   const navigate = useNavigate();
 
   const [message, setMessage] = useState("");
+
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const [typingUser, setTypingUser] = useState("");
 
@@ -153,6 +156,10 @@ useEffect(() => {
   });
 }, [messages]);
 
+  const onEmojiClick = (emojiData) => {
+    setMessage((prev) => prev + emojiData.emoji);
+    setShowEmojiPicker(false);
+  };
 
   const sendMessage = () => {
 
@@ -339,7 +346,23 @@ useEffect(() => {
 
            <div className="flex gap-3">
 
-            <input
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                className="bg-red-600 text-white px-6 py-3 rounded"
+              >
+                TEST BUTTON
+              </button>
+
+              {showEmojiPicker && (
+                <div className="absolute bottom-14 left-0 z-50">
+                  <EmojiPicker onEmojiClick={onEmojiClick} />
+                </div>
+              )}
+           </div>
+    
+           <input
     
             value={message}
 
