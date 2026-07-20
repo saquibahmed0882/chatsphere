@@ -35,15 +35,16 @@ A modern <b>Full Stack Real-Time Chat Application</b> inspired by <b>iMessage</b
 
 ## 🚀 Features
 
-- 🔐 User Authentication (Login & Signup)
+- 🔐 Secure User Authentication (Login & Signup)
 - 💬 Real-Time Messaging with Socket.IO
 - 🟢 Online / Offline User Status
 - ⌨️ Typing Indicator
 - 📜 Persistent Chat History
-- 👤 User List
+- 👤 User List Management
+- 😊 Emoji Support
 - ⚡ Fast and Responsive UI
-- 🔒 JWT Authentication
-- 🌐 MongoDB Database
+- 🔒 JWT Based Authentication
+- 🌐 MongoDB Atlas Database Integration
 
 ---
 
