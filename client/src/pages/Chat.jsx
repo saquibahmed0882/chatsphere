@@ -5,7 +5,7 @@ import EmojiPicker from "emoji-picker-react";
 
 let typingTimer;
 
-const socket = io("http://localhost:8000");
+const socket = io("https://chatsphere-backend-518s.onrender.com");
 
 function Chat() {
 
@@ -230,7 +230,7 @@ useEffect(() => {
     console.log("SELECTED MESSAGE ID:", selectedMessage?._id);
 
     const res = await fetch(
-      "http://localhost:8000/api/messages/delete-for-everyone",
+      "https://chatsphere-backend-518s.onrender.com/api/messages/delete-for-everyone",
       {
         method: "DELETE",
         headers: {
@@ -255,7 +255,7 @@ useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     await fetch(
-      "http://localhost:8000/api/messages/delete-for-me",
+      "https://chatsphere-backend-518s.onrender.com/api/messages/delete-for-me",
       {
         method: "DELETE",
         headers: {
