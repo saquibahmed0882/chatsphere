@@ -26,6 +26,9 @@ exports.deleteForEveryone = async (req, res) => {
 
     const io = socket.getIO();
 
+    console.log("BODY:", req.body);
+    console.log("MESSAGE ID:", req.body.messageId);
+
     const { messageId } = req.body;
 
     console.log("DELETE REQUEST:", messageId);
