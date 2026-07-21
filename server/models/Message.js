@@ -25,6 +25,17 @@ const messageSchema = new mongoose.Schema(
       type:String,
       default:"sent"
     },
+    
+    deletedFor: [
+      {
+        type: String,
+      },
+    ],
+
+    deletedForEveryone: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

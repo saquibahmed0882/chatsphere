@@ -16,6 +16,7 @@ const app = express();
 const server = http.createServer(app);
 
 // Socket.IO Setup
+const socket = require("./socket");
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -23,6 +24,7 @@ const io = new Server(server, {
   }
 });
 
+socket.init(io);
 
 const onlineUsers = new Set();
 
@@ -100,6 +102,61 @@ io.on("connection", (socket) => {
 
 });
 
+socket.on("deleteMessage", async (messageId) => {
+
+  console.log("DELETE REQUEST ID:", messageId);
+
+  try {
+
+    const updatedMessage = await Message.findByIdAndUpdate(
+      messageId,
+      {
+        text: "This message was deleted",
+        deletedForEveryone: true
+      },
+      { new: true }
+    );
+
+
+    console.log("UPDATED MESSAGE:", updatedMessage);
+
+    console.log("TYPE CHECK:", typeof updatedMessage);
+
+    if(updatedMessage){
+      console.log("🔥 INSIDE IF BLOCK");
+
+      console.log(
+        "EMITTING DELETE TO:",
+        updatedMessage.receiver,
+        updatedMessage.sender
+      );
+
+      io.to(updatedMessage.receiver).emit(
+        "messageDeleted",
+        updatedMessage
+      );
+
+
+      io.to(updatedMessage.sender).emit(
+        "messageDeleted",
+        updatedMessage
+      );
+
+    }
+    else{
+     
+      console.log("❌ UPDATED MESSAGE IS NULL");
+     
+    }
+
+
+  } catch(error){
+
+    console.log("DELETE ERROR:", error);
+
+  }
+
+});
 
   socket.on("disconnect", () => {
 
@@ -144,3 +201,5 @@ server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 
 });
+
+module.exports = io;

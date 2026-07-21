@@ -98,6 +98,20 @@ useEffect(() => {
 
     });
 
+    socket.on("messageDeleted", (updatedMessage) => {
+
+      console.log("🔥 DELETE RECEIVED:", updatedMessage);
+
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg._id === updatedMessage._id
+            ? updatedMessage
+            : msg
+        )
+      );
+
+    });
+
     socket.on("typing", (data) => {
 
 
@@ -120,6 +134,7 @@ useEffect(() => {
 
       socket.off("connect");
       socket.off("receiveMessage");
+      socket.off("messageDeleted");
       socket.off("typing");
       socket.off("onlineUsers");
         
@@ -142,6 +157,8 @@ useEffect(() => {
       console.log("📜 Chat History:", data);
 
       console.log("First Message:", data[0]);
+
+      console.log("FIRST MESSAGE ID:", data[0]?._id);
 
       setMessages(data);
 
@@ -210,7 +227,9 @@ useEffect(() => {
   const deleteForEveryone = async () => {
     if (!selectedMessage) return;
 
-    await fetch(
+    console.log("SELECTED MESSAGE ID:", selectedMessage?._id);
+
+    const res = await fetch(
       "http://localhost:8000/api/messages/delete-for-everyone",
       {
         method: "DELETE",
@@ -222,6 +241,10 @@ useEffect(() => {
         }),
       }
     );
+    
+    const data = await res.json();
+
+    console.log("DELETE RESPONSE:", data);
 
     setSelectedMessage(null);
   };
@@ -243,6 +266,12 @@ useEffect(() => {
           userId: user.id,
         }),
       }
+    );
+
+    setMessages((prev) =>
+      prev.filter(
+        (msg) => msg._id !== selectedMessage._id
+      )
     );
 
     setSelectedMessage(null);
@@ -314,8 +343,10 @@ useEffect(() => {
 
          {messages.map((msg,index)=> {
    
+           console.log("RENDER MESSAGE:", msg._id, msg.text);
+
            return (     
-            <div key={index}>
+            <div key={msg._id}>
 
               <div className="border border-red-500 p-3 bg-white text-black">
 
