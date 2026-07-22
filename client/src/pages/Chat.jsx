@@ -6,7 +6,8 @@ import EmojiPicker from "emoji-picker-react";
 
 let typingTimer;
 
-const socket = io("http://localhost:8000");
+const API = import.meta.env.VITE_API_URL;
+const socket = io(API);
 
 function Chat() {
 
@@ -39,7 +40,7 @@ const messagesEndRef = useRef(null);
 useEffect(() => {
 
 
-    fetch("http://localhost:8000/api/users")
+    fetch("/api/users")
     .then(res => res.json())
     .then(data => {
       console.log("Users:", data.users);
@@ -160,7 +161,7 @@ useEffect(() => {
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
   fetch(
-    `http://localhost:8000/api/messages/${currentUser.id}/${selectedUser._id}`
+    `/api/messages/${currentUser.id}/${selectedUser._id}`
   )
     .then((res) => res.json())
     .then((data) => {
@@ -234,7 +235,7 @@ const handleFileUpload = async (file) => {
   formData.append("file", file);
 
   const res = await fetch(
-    "http://localhost:8000/upload",
+    "/upload",
     {
       method: "POST",
       body: formData
@@ -254,7 +255,7 @@ const handleFileUpload = async (file) => {
     sender: user.id,
     receiver: selectedUser._id,
     text: "",
-    fileUrl: `http://localhost:8000/${data.file.path}`,
+    fileUrl: `/${data.file.path}`,
     fileType: file.type,
     replyTo: replyMessage ? replyMessage._id : null
   };
@@ -285,7 +286,7 @@ const handleFileUpload = async (file) => {
     console.log("SELECTED MESSAGE ID:", selectedMessage?._id);
 
     const res = await fetch(
-      "http://localhost:8000/api/messages/delete-for-everyone",
+      "/api/messages/delete-for-everyone",
       {
         method: "DELETE",
         headers: {
@@ -310,7 +311,7 @@ const handleFileUpload = async (file) => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     await fetch(
-      "http://localhost:8000/api/messages/delete-for-me",
+      "/api/messages/delete-for-me",
       {
         method: "DELETE",
         headers: {
