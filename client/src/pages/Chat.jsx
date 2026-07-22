@@ -34,6 +34,13 @@ function Chat() {
 
 const [replyMessage, setReplyMessage] = useState(null);
 const [selectedMessage, setSelectedMessage] = useState(null);
+const [incomingCall, setIncomingCall] = useState(null);
+const [callActive, setCallActive] = useState(false);
+
+const localStream = useRef(null);
+const peerConnection = useRef(null);
+const remoteAudio = useRef(null);
+
 
 const messagesEndRef = useRef(null);
 
@@ -47,6 +54,174 @@ useEffect(() => {
       setUsers(data.users);
     })
     .catch(err => console.log(err));
+
+
+
+
+
+    // 📞 Incoming Call Listener
+    socket.on("incoming-call", (data) => {
+
+      console.log("📞 INCOMING CALL:", data);
+
+      setIncomingCall(data);
+
+    });
+
+
+    socket.on("call-accepted", () => {
+
+      console.log("✅ CALL ACCEPTED");
+
+    });
+
+    socket.on("answer", async (data) => {
+
+      console.log("📡 ANSWER RECEIVED:", data);
+
+
+      await peerConnection.current.setRemoteDescription(
+        data.answer
+      );
+
+
+      console.log("✅ REMOTE DESCRIPTION SET");
+
+    });
+
+    socket.on("ice-candidate", async (data)=>{
+
+      try {
+
+        await peerConnection.current.addIceCandidate(
+          data.candidate
+        );
+
+        console.log("🧊 ICE ADDED");
+
+      } catch(error){
+
+        console.log("ICE ERROR:", error);
+
+      }
+
+    });
+
+
+
+
+
+
+    socket.on("call-rejected", () => {
+
+      console.log("❌ CALL REJECTED");
+
+    });
+
+
+    socket.on("call-ended", () => {
+
+      console.log("📴 CALL ENDED");
+
+    });
+
+    // 📡 Receive WebRTC Offer
+
+    socket.on("offer", async (data) => {
+
+      console.log("📡 OFFER RECEIVED:", data);
+
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true
+      });
+
+
+      localStream.current = stream;
+
+
+      peerConnection.current = new RTCPeerConnection({
+        iceServers: [
+          {
+            urls: "stun:stun.l.google.com:19302"
+          }
+        ]
+      });
+
+
+      peerConnection.current.onicecandidate = (event) => {
+
+        if(event.candidate){
+
+          socket.emit("ice-candidate", {
+            receiverId: data.callerId,
+            candidate: event.candidate
+          });
+
+          console.log("🧊 ICE SENT");
+
+        }
+
+      };
+
+
+      peerConnection.current.ontrack = (event) => {
+
+        console.log("🎧 REMOTE AUDIO RECEIVED");
+
+
+        if(remoteAudio.current){
+
+          remoteAudio.current.srcObject =
+            event.streams[0];
+
+          remoteAudio.current.play();
+
+        }
+
+      };
+
+
+      stream.getTracks().forEach((track)=>{
+
+        peerConnection.current.addTrack(
+          track,
+          stream
+        );
+
+      });
+
+
+      await peerConnection.current.setRemoteDescription(
+        data.offer
+      );
+
+
+      const answer =
+        await peerConnection.current.createAnswer();
+
+
+      await peerConnection.current.setLocalDescription(
+        answer
+      );
+
+
+      const user =
+        JSON.parse(localStorage.getItem("user"));
+
+
+      socket.emit("answer", {
+
+        receiverId: data.callerId,
+
+        answer
+
+      });
+
+
+      console.log("📡 ANSWER SENT");
+
+    });
 
 
 
@@ -141,7 +316,83 @@ useEffect(() => {
     });
 
     
-    return () => {
+    
+
+const startVoiceCall = async () => {
+
+  try {
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true
+    });
+
+    localStream.current = stream;
+
+
+    peerConnection.current = new RTCPeerConnection({
+      iceServers: [
+        {
+          urls: "stun:stun.l.google.com:19302"
+        }
+      ]
+    });
+
+
+    stream.getTracks().forEach((track) => {
+
+      peerConnection.current.addTrack(
+        track,
+        stream
+      );
+
+    });
+
+
+    console.log("🔗 Peer Connection Created");
+
+
+    console.log("🎤 Microphone access granted");
+
+    setCallActive(true);
+
+  } catch(error) {
+
+    console.log("❌ Microphone permission error:", error);
+
+  }
+
+};
+
+
+const acceptCall = async () => {
+
+  socket.emit("accept-call", {
+    callerId: incomingCall.callerId
+  });
+
+  console.log("✅ ACCEPT CALL");
+
+  await startVoiceCall();
+
+  setIncomingCall(null);
+
+};
+
+
+const rejectCall = () => {
+
+  socket.emit("reject-call", {
+    callerId: incomingCall.callerId
+  });
+
+  console.log("❌ REJECT CALL");
+
+  setIncomingCall(null);
+
+};
+
+
+return () => {
 
       socket.off("connect");
       socket.off("receiveMessage");
@@ -191,7 +442,109 @@ useEffect(() => {
     setShowEmojiPicker(false);
   };
 
-  const sendMessage = () => {
+  
+const startCall = async (type) => {
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  if (!selectedUser) {
+    alert("Please select a user first");
+    return;
+  }
+
+
+  socket.emit("call-user", {
+    receiverId: selectedUser._id,
+    callerId: user.id,
+    callerName: user.name,
+    callType: type
+  });
+
+
+  console.log("📞 CALL SENT:", type);
+
+
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: true
+  });
+
+
+  localStream.current = stream;
+
+
+  peerConnection.current = new RTCPeerConnection({
+    iceServers: [
+      {
+        urls: "stun:stun.l.google.com:19302"
+      }
+    ]
+  });
+
+
+  peerConnection.current.ontrack = (event) => {
+
+    console.log("🎧 REMOTE AUDIO RECEIVED");
+
+
+    if(remoteAudio.current){
+
+      remoteAudio.current.srcObject =
+        event.streams[0];
+
+      remoteAudio.current.play();
+
+    }
+
+  };
+
+
+  peerConnection.current.onicecandidate = (event) => {
+
+    if(event.candidate){
+
+      socket.emit("ice-candidate", {
+        receiverId: selectedUser._id,
+        candidate: event.candidate
+      });
+
+      console.log("🧊 ICE SENT");
+
+    }
+
+  };
+
+
+  stream.getTracks().forEach(track => {
+    peerConnection.current.addTrack(
+      track,
+      stream
+    );
+  });
+
+
+  const offer = await peerConnection.current.createOffer();
+
+  await peerConnection.current.setLocalDescription(
+    offer
+  );
+
+
+  socket.emit("offer", {
+
+    receiverId: selectedUser._id,
+
+    callerId: user.id,
+
+    offer
+
+  });
+
+
+  console.log("📡 OFFER SENT");
+
+};
+
+const sendMessage = () => {
 
     if (!selectedUser) {
       alert("Please select a user first");
@@ -334,7 +687,51 @@ const handleFileUpload = async (file) => {
   };  
 
 return (
+  <>
+
+  <audio
+    ref={remoteAudio}
+    autoPlay
+  />
+
+  {incomingCall && (
+    <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+
+      <div className="bg-slate-800 p-6 rounded-2xl text-center">
+
+        <h2 className="text-white text-xl font-bold">
+          Incoming {incomingCall.callType} Call
+        </h2>
+
+        <p className="text-gray-300 mt-2">
+          {incomingCall.callerName}
+        </p>
+
+        <div className="flex gap-4 mt-5">
+
+          <button
+            onClick={acceptCall}
+            className="bg-green-600 text-white px-5 py-2 rounded-xl"
+          >
+            Accept
+          </button>
+
+          <button
+            onClick={rejectCall}
+            className="bg-red-600 text-white px-5 py-2 rounded-xl"
+          >
+            Reject
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+  )}
+
   <ChatLayout
+    startCall={startCall}
     users={users}
     onlineUsers={onlineUsers}
     selectedUser={selectedUser}
@@ -366,6 +763,7 @@ return (
       <EmojiPicker onEmojiClick={onEmojiClick} />
     )}
   </ChatLayout>
+  </>
 );
 
 }
