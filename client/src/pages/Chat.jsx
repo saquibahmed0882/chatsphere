@@ -40,7 +40,7 @@ const messagesEndRef = useRef(null);
 useEffect(() => {
 
 
-    fetch("/api/users")
+    fetch(`${API}/api/users`)
     .then(res => res.json())
     .then(data => {
       console.log("Users:", data.users);
@@ -161,7 +161,7 @@ useEffect(() => {
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
   fetch(
-    `/api/messages/${currentUser.id}/${selectedUser._id}`
+    `${API}/api/messages/${currentUser.id}/${selectedUser._id}`
   )
     .then((res) => res.json())
     .then((data) => {
@@ -235,7 +235,7 @@ const handleFileUpload = async (file) => {
   formData.append("file", file);
 
   const res = await fetch(
-    "/upload",
+    `${API}/upload`,
     {
       method: "POST",
       body: formData
@@ -255,7 +255,7 @@ const handleFileUpload = async (file) => {
     sender: user.id,
     receiver: selectedUser._id,
     text: "",
-    fileUrl: `/${data.file.path}`,
+    fileUrl: `${API}/${data.file.path}`,
     fileType: file.type,
     replyTo: replyMessage ? replyMessage._id : null
   };
@@ -286,7 +286,7 @@ const handleFileUpload = async (file) => {
     console.log("SELECTED MESSAGE ID:", selectedMessage?._id);
 
     const res = await fetch(
-      "/api/messages/delete-for-everyone",
+      `${API}/api/messages/delete-for-everyone`,
       {
         method: "DELETE",
         headers: {
@@ -311,7 +311,7 @@ const handleFileUpload = async (file) => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     await fetch(
-      "/api/messages/delete-for-me",
+      `${API}/api/messages/delete-for-me`,
       {
         method: "DELETE",
         headers: {
