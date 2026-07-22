@@ -18,4 +18,5 @@ build/
 # Logs
 *.log
 .vercel
-client/src/pages/Chat_backup.jsx
+client/src/pages/*backup*.jsx
+server/uploads/
