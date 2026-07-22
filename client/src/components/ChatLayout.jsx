@@ -9,6 +9,7 @@ function ChatLayout({
   users,
   onlineUsers,
   selectedUser,
+  startCall,
   setSelectedUser,
   messages,
   currentUser,
@@ -41,6 +42,7 @@ function ChatLayout({
         <ChatHeader
           selectedUser={selectedUser}
           onlineUsers={onlineUsers}
+          startCall={startCall}
         />
 
         <div className="flex-1 overflow-y-auto p-5">

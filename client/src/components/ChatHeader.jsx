@@ -1,6 +1,6 @@
 import { FaPhoneAlt, FaVideo, FaEllipsisV } from "react-icons/fa";
 
-function ChatHeader({ selectedUser, onlineUsers }) {
+function ChatHeader({ selectedUser, onlineUsers, startCall}) {
   const isOnline =
     selectedUser && onlineUsers.includes(selectedUser._id);
 
@@ -41,9 +41,15 @@ function ChatHeader({ selectedUser, onlineUsers }) {
 
       <div className="flex gap-5 text-gray-300 text-lg">
 
-        <FaPhoneAlt className="cursor-pointer hover:text-blue-500 transition" />
+        <FaPhoneAlt
+          onClick={() => startCall("voice")}
+          className="cursor-pointer hover:text-blue-500 transition"
+/>
 
-        <FaVideo className="cursor-pointer hover:text-blue-500 transition" />
+        <FaVideo
+          onClick={() => startCall("video")}
+          className="cursor-pointer hover:text-blue-500 transition"
+/>
 
         <FaEllipsisV className="cursor-pointer hover:text-blue-500 transition" />
 

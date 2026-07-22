@@ -240,6 +240,82 @@ server.listen(PORT, () => {
 
   console.log(`Server running on http://localhost:${PORT}`);
 
+
+// 📞 WebRTC Call Signaling
+
+socket.on("call-user", (data) => {
+
+  console.log("📞 CALL REQUEST:", data);
+
+  io.to(data.receiverId).emit("incoming-call", {
+    callerId: data.callerId,
+    callerName: data.callerName,
+    callType: data.callType
+  });
+
+});
+
+
+socket.on("accept-call", (data) => {
+
+  console.log("✅ CALL ACCEPTED:", data);
+
+  io.to(data.callerId).emit("call-accepted");
+
+});
+
+
+socket.on("reject-call", (data) => {
+
+  console.log("❌ CALL REJECTED:", data);
+
+  io.to(data.callerId).emit("call-rejected");
+
+});
+
+
+socket.on("end-call", (data)=>{
+
+  console.log("📴 CALL ENDED:", data);
+
+  io.to(data.receiverId).emit("call-ended");
+
+});
+
+socket.on("offer", (data) => {
+
+  console.log("📡 OFFER RECEIVED:", data);
+
+  io.to(data.receiverId).emit("offer", {
+    offer: data.offer,
+    callerId: data.callerId
+  });
+
+});
+
+
+socket.on("answer", (data) => {
+
+  console.log("📡 ANSWER RECEIVED:", data);
+
+  io.to(data.receiverId).emit("answer", {
+    answer: data.answer
+  });
+
+});
+
+
+socket.on("ice-candidate", (data) => {
+
+  console.log("🧊 ICE CANDIDATE");
+
+  io.to(data.receiverId).emit("ice-candidate", {
+    candidate: data.candidate
+  });
+
+});
+
+
 });
 
 module.exports = io;
