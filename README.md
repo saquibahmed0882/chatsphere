@@ -38,15 +38,18 @@ A modern <b>Full Stack Real-Time Chat Application</b> inspired by <b>iMessage</b
 - 🔐 Secure User Authentication (Login & Signup)
 - 🔒 JWT Based Authentication
 - 💬 Real-Time Messaging with Socket.IO
+- 🟢 Real-Time Online / Offline User Status
 - 🟢 Online / Offline User Status
-- ⌨️ Typing Indicator
+- ⌨ ️ Typing Indicator
 - 📜 Persistent Chat History
-- ↩️ Reply to Messages
-- 🗑️ Delete for Me
+- 🖼️ Image Sharing
+- 📄 PDF & Document Sharing
+- ↩ ️ Reply to Messages
+- 🗑 ️ Delete for Me
 - 🌍 Delete for Everyone (Real-Time)
 - 👤 User List Management
-- 😊 Emoji Support
-- ⚡ Fast and Responsive UI
+- 😊 Emoji Picker Support
+- ⚡ Fast and Responsive WhatsApp-Style UI
 - 🍃 MongoDB Atlas Database Integration
 
 ---
