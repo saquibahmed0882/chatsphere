@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
+const fs = require("fs");
 const http = require("http");
 const { Server } = require("socket.io");
 
@@ -16,11 +17,17 @@ const Message = require("./models/Message");
 
 const app = express();
 
+const uploadDir = "./uploads";
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
+
 const upload = multer({
   storage: multer.diskStorage({
 
     destination: function(req, file, cb){
-      cb(null, "uploads/");
+      cb(null, uploadDir);
     },
 
     filename: function(req, file, cb){
