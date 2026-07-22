@@ -39,7 +39,7 @@ const messagesEndRef = useRef(null);
 useEffect(() => {
 
 
-    fetch("https://chatsphere-backend-518s.onrender.com/api/users")
+    fetch("http://localhost:8000/api/users")
     .then(res => res.json())
     .then(data => {
       console.log("Users:", data.users);
@@ -160,7 +160,7 @@ useEffect(() => {
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
   fetch(
-    `https://localhost:8000/api/messages/${currentUser.id}/${selectedUser._id}`
+    `http://localhost:8000/api/messages/${currentUser.id}/${selectedUser._id}`
   )
     .then((res) => res.json())
     .then((data) => {
@@ -310,7 +310,7 @@ const handleFileUpload = async (file) => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     await fetch(
-      "https://chatsphere-backend-518s.onrender.com/api/messages/delete-for-me",
+      "http://localhost:8000/api/messages/delete-for-me",
       {
         method: "DELETE",
         headers: {
