@@ -14,8 +14,19 @@ const messageSchema = new mongoose.Schema(
 
     text: {
       type: String,
-      required: true,
+      default: ""
     },
+
+    fileUrl: {
+      type: String,
+      default: "",
+    },
+
+    fileType: {
+      type: String,    
+      default: "",
+    },
+
     replyTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Message",

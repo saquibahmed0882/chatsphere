@@ -32,6 +32,24 @@ function MessageBubble({
           </div>
         )}
 
+        {msg.fileUrl && (
+          <img
+            src={msg.fileUrl}
+            alt="attachment"
+            className="rounded-lg max-w-xs mb-2"
+          />
+        )}       
+
+        {msg.fileType === "application/pdf" && (
+          <a
+            href={msg.fileUrl}
+            target="_blank"
+            className="text-blue-300 underline"
+          >
+            📄 Open PDF
+          </a>
+        )}
+
         <p className="break-words">{msg.text}</p>
 
         <div className="flex justify-between items-center mt-2">

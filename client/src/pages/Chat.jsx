@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import ChatLayout from "../components/ChatLayout";
 import { io } from "socket.io-client";
 import EmojiPicker from "emoji-picker-react";
 
 let typingTimer;
 
-const socket = io("https://chatsphere-backend-518s.onrender.com");
+const socket = io("http://localhost:8000");
 
 function Chat() {
 
@@ -88,6 +89,14 @@ useEffect(() => {
       
       setMessages((prev) => {
      
+        const exists = prev.some(
+          (m) => String(m._id) === String(msg._id)
+        );
+
+        if (exists) {
+          return prev;
+        }
+        
         const updated = [...prev, msg];
 
         console.log("Messages After Update:", updated);
@@ -101,10 +110,10 @@ useEffect(() => {
     socket.on("messageDeleted", (updatedMessage) => {
 
       console.log("🔥 DELETE RECEIVED:", updatedMessage);
-
+  
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
-          msg._id === updatedMessage._id
+          String(msg._id) ===  String(updatedMessage._id)
             ? updatedMessage
             : msg
         )
@@ -112,8 +121,8 @@ useEffect(() => {
 
     });
 
-    socket.on("typing", (data) => {
 
+    socket.on("typing", (data) => {
 
       setTypingUser(data.name);
 
@@ -130,6 +139,7 @@ useEffect(() => {
 
     });
 
+    
     return () => {
 
       socket.off("connect");
@@ -141,7 +151,8 @@ useEffect(() => {
     };
 
 
-}, []);
+  }, []);
+
 useEffect(() => {
 
   if (!selectedUser) return;
@@ -149,7 +160,7 @@ useEffect(() => {
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
   fetch(
-    `https://chatsphere-backend-518s.onrender.com/api/messages/${currentUser.id}/${selectedUser._id}`
+    `https://localhost:8000/api/messages/${currentUser.id}/${selectedUser._id}`
   )
     .then((res) => res.json())
     .then((data) => {
@@ -199,7 +210,6 @@ useEffect(() => {
 
     console.log("Sending:", newMessage);
 
-
     socket.emit(
       "sendMessage",
       newMessage
@@ -212,6 +222,51 @@ useEffect(() => {
  
   };
 
+const handleFileUpload = async (file) => {
+
+  if (!selectedUser) {
+    alert("Please select a user first");
+    return;
+  }
+
+  const formData = new FormData();
+
+  formData.append("file", file);
+
+  const res = await fetch(
+    "http://localhost:8000/upload",
+    {
+      method: "POST",
+      body: formData
+    }
+  );
+
+  const data = await res.json();
+
+  console.log("Uploaded File:", data);
+  console.log("FILE DATA:", data.file);
+
+  console.log("CREATING MESSAGE");
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const newMessage = {
+    sender: user.id,
+    receiver: selectedUser._id,
+    text: "",
+    fileUrl: `http://localhost:8000/${data.file.path}`,
+    fileType: file.type,
+    replyTo: replyMessage ? replyMessage._id : null
+  };
+
+  console.log("📸 Sending File Message:", newMessage);
+
+  socket.emit(
+    "sendMessage",
+    newMessage
+  );
+
+};
 
 
   const logout = () => {
@@ -230,7 +285,7 @@ useEffect(() => {
     console.log("SELECTED MESSAGE ID:", selectedMessage?._id);
 
     const res = await fetch(
-      "https://chatsphere-backend-518s.onrender.com/api/messages/delete-for-everyone",
+      "http://localhost:8000/api/messages/delete-for-everyone",
       {
         method: "DELETE",
         headers: {
@@ -277,255 +332,41 @@ useEffect(() => {
     setSelectedMessage(null);
   };  
 
-  return (
-    <>
-      <div className="min-h-screen bg-gray-950 text-white flex">
+return (
+  <ChatLayout
+    users={users}
+    onlineUsers={onlineUsers}
+    selectedUser={selectedUser}
+    setSelectedUser={setSelectedUser}
 
-      <div className="w-72 bg-gray-900 p-6 border-r border-gray-800">
+    messages={messages}
 
-        <h1 className="text-3xl font-bold text-blue-500">
-          ChatSphere
-        </h1>
+    currentUser={JSON.parse(localStorage.getItem("user"))}
 
+    replyMessage={replyMessage}
+    setReplyMessage={setReplyMessage}
 
-        <h2 className="text-gray-400 mt-8">
-          Online Users
-        </h2>
+    selectedMessage={selectedMessage}
+    setSelectedMessage={setSelectedMessage}
 
+    message={message}
+    setMessage={setMessage}
 
-        <div className="mt-4 space-y-3">
+    sendMessage={sendMessage}
+    handleFileUpload={handleFileUpload}
 
-        {
-           users.map((user)=>(
-             <div
-               key={user._id}
-               onClick={() => setSelectedUser(user)}
-               className="bg-gray-800 p-3 rounded-lg cursor-pointer hover:bg-gray-700"
-             >
-               <span className="mr-2">
-                 {onlineUsers.includes(user._id) ? "🟢" : "⚪"}
-               </span>
-               {user.name} ({user._id.slice(-4)})
-             </div>
-           ))
-         }
+    showEmojiPicker={showEmojiPicker}
+    setShowEmojiPicker={setShowEmojiPicker}
 
-         </div>
+    deleteForEveryone={deleteForEveryone}
+    deleteForMe={deleteForMe}
+  >
+    {showEmojiPicker && (
+      <EmojiPicker onEmojiClick={onEmojiClick} />
+    )}
+  </ChatLayout>
+);
 
-        <button
-          onClick={logout}
-          className="mt-10 w-full bg-red-600 py-3 rounded-lg"
-        >
-          Logout
-        </button>
+}
 
-
-      </div>
-
-
-
-      <div className="flex-1 flex flex-col">
-
-
-      <div className="bg-gray-900 p-5 text-xl font-semibold">
-
-      {
-        selectedUser
-        ? `Chat with ${selectedUser.name}`
-        : "Select User"
-       }
-
-       </div>
-
-
-        <div className="flex-1 p-6 overflow-y-auto space-y-4">
-
-
-         {messages.map((msg,index)=> {
-   
-           console.log("RENDER MESSAGE:", msg._id, msg.text);
-
-           return (     
-            <div key={msg._id}>
-
-              <div className="border border-red-500 p-3 bg-white text-black">
-
-              <b>
-              {users.find((u) => u._id === msg.sender)?.name || msg.sender}:
-              </b>{" "}
-
-              {msg.text}
-              
-              <div className="mt-2">
-                <button
-                  onClick={() => setReplyMessage(msg)}
-                  className="bg-blue-600 text-white px-3 py-1 rounded mt-2"
-                >
-                   Reply
-                </button>
-     
-                <button
-                  onClick={() => setSelectedMessage(msg)}
-                  className="bg-red-600 text-white px-3 py-1 rounded mt-2 ml-2"
-                >
-                  Delete
-                </button>
-              </div>
-
-              {msg.createdAt && (
-                <div className="text-xs text-gray-200 mt-1">
-                  {new Date(msg.createdAt).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </div>
-               )}
-
-
-              </div>
-
-
-            </div>
-           );   
-
-         })}
-
-          {
-            typingUser && (
-              <p className="text-gray-400 text-sm">
-                {typingUser} is typing...
-              </p>
-            )
-           }
-
-          <div ref={messagesEndRef}></div>
-
-        </div>
-
-
-
-        <div className="bg-gray-900 p-5 flex gap-3">
-
-            {replyMessage && (
-              <div className="bg-gray-800 p-3 rounded-lg border-l-4 border-blue-500">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-xs text-blue-400">Replying to</p>
-                    <p className="text-sm text-white">{replyMessage.text}</p>
-                  </div>
-
-                  <button
-                    onClick={() => setReplyMessage(null)}
-                    className="text-red-500 font-bold"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-            )}
-
-           <div className="flex gap-3">
-
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg transition text-2xl"
-                title="Choose Emoji"
-              >
-                😊
-              </button>
-
-              {showEmojiPicker && (
-                <div className="absolute bottom-14 left-0 z-50">
-                  <EmojiPicker onEmojiClick={onEmojiClick} />
-                </div>
-              )}
-           </div>
-    
-           <input
-    
-            value={message}
-
-            onChange={(e)=>{
-
-              setMessage(e.target.value);
-
-              const user = JSON.parse(localStorage.getItem("user"));
-
-              if(selectedUser){
-
-                socket.emit("typing", {
-
-                  receiver: selectedUser._id,
-                  name: user.name
-
-                });
-
-                console.log("⌨️ Typing sent");
-
-              }
-
-            }}
-
-
-            placeholder="Type message..."
-
-            className="flex-1 bg-gray-800 p-3 rounded-lg outline-none"
-
-          />
-
-
-          <button
-            onClick={() => {
-              console.log("SEND BUTTON CLICKED");
-              sendMessage();
-            }}
-            className="bg-blue-600 px-6 rounded-lg"
-          >          
-            Send
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-    {selectedMessage && (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg w-80 text-black">
-
-        <h2 className="text-xl font-bold mb-4">
-          Delete Message
-        </h2>
-
-        <button
-          onClick={deleteForEveryone}
-          className="w-full bg-red-600 text-white py-2 rounded mb-2"
-        >
-          Delete for Everyone
-        </button>
-
-        <button
-          onClick={deleteForMe}
-          className="w-full bg-yellow-500 text-white py-2 rounded mb-2"
-        >
-          Delete for Me
-        </button>
-
-        <button
-          onClick={() => setSelectedMessage(null)}
-          className="w-full bg-gray-500 text-white py-2 rounded"
-        >
-          Cancel
-        </button>
-
-      </div>
-    </div>
-  )}
-
-  </>
- );
- }
-
-
- export default Chat;
+export default Chat;

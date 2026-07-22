@@ -5,6 +5,9 @@ require("dotenv").config();
 const http = require("http");
 const { Server } = require("socket.io");
 
+const multer = require("multer");
+const path = require("path");
+
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -13,9 +16,25 @@ const Message = require("./models/Message");
 
 const app = express();
 
+const upload = multer({
+  storage: multer.diskStorage({
+
+    destination: function(req, file, cb){
+      cb(null, "uploads/");
+    },
+
+    filename: function(req, file, cb){
+      cb(
+        null,
+        Date.now() + path.extname(file.originalname)
+      );
+    }
+
+  })
+});
+
 const server = http.createServer(app);
 
-// Socket.IO Setup
 const socket = require("./socket");
 const io = new Server(server, {
   cors: {
@@ -67,6 +86,8 @@ io.on("connection", (socket) => {
         sender: message.sender,
         text: message.text,
         receiver: message.receiver,
+        fileUrl: message.fileUrl || "",
+        fileType: message.fileType || "",
         replyTo: message.replyTo || null,
         status: "sent"
       });
@@ -178,6 +199,18 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
+app.use("/uploads", express.static("uploads"));
+
+app.post("/upload", upload.single("file"), (req, res) => {
+
+  console.log("Uploaded File:", req.file);
+
+  res.json({
+    message: "File uploaded successfully",
+    file: req.file
+  });
+
+});
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);

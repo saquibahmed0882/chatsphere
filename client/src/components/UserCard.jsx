@@ -4,39 +4,53 @@ function UserCard({
   selectedUser,
   setSelectedUser,
 }) {
+  const isSelected = selectedUser?._id === user._id;
+
   return (
     <div
       onClick={() => setSelectedUser(user)}
-      className={`flex items-center gap-3 p-4 cursor-pointer transition-all duration-200 border-b border-slate-800 hover:bg-slate-800 ${
-        selectedUser?._id === user._id
-          ? "bg-slate-800"
-          : ""
+      className={`mx-3 my-2 rounded-2xl cursor-pointer transition-all duration-300
+      ${
+        isSelected
+          ? "bg-blue-700 shadow-lg"
+          : "bg-slate-800 hover:bg-slate-700"
       }`}
     >
-      <div className="relative">
+      <div className="flex items-center gap-4 p-4">
 
-        <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
-          {user.name.charAt(0).toUpperCase()}
+        <div className="relative">
+
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-xl shadow-md">
+            {user.name.charAt(0).toUpperCase()}
+          </div>
+
+          {online && (
+            <span className="absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full bg-green-500 border-2 border-slate-800"></span>
+          )}
+
         </div>
 
-        {online && (
-          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0f172a]"></div>
-        )}
+        <div className="flex-1 min-w-0">
+
+          <div className="flex justify-between items-center">
+
+            <h2 className="font-semibold text-white truncate">
+              {user.name}
+            </h2>
+
+            <span className="text-[11px] text-gray-400">
+              now
+            </span>
+
+          </div>
+
+          <p className="text-sm text-gray-400 truncate mt-1">
+            {online ? "🟢 Online" : "Last seen recently"}
+          </p>
+
+        </div>
 
       </div>
-
-      <div className="flex-1 overflow-hidden">
-
-        <h2 className="text-white font-semibold truncate">
-          {user.name}
-        </h2>
-
-        <p className="text-gray-400 text-sm truncate">
-          Tap to chat...
-        </p>
-
-      </div>
-
     </div>
   );
 }

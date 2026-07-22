@@ -19,6 +19,7 @@ function ChatLayout({
   message,
   setMessage,
   sendMessage,
+  handleFileUpload,
   showEmojiPicker,
   setShowEmojiPicker,
   deleteForEveryone,
@@ -66,6 +67,7 @@ function ChatLayout({
           message={message}
           setMessage={setMessage}
           sendMessage={sendMessage}
+          handleFileUpload={handleFileUpload}
           showEmojiPicker={showEmojiPicker}
           setShowEmojiPicker={setShowEmojiPicker}
         >
