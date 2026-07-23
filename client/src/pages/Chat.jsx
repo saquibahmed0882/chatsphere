@@ -5,6 +5,7 @@ import { io } from "socket.io-client";
 import EmojiPicker from "emoji-picker-react";
 
 let typingTimer;
+let iceCandidateQueue = [];
 
 const API = import.meta.env.VITE_API_URL;
 const socket = io(API);
@@ -87,17 +88,33 @@ useEffect(() => {
 
       console.log("✅ REMOTE DESCRIPTION SET");
 
+      iceCandidateQueue.forEach(async(candidate)=>{
+        await peerConnection.current.addIceCandidate(candidate);
+      });
+
+      iceCandidateQueue = [];
+
     });
 
     socket.on("ice-candidate", async (data)=>{
 
       try {
 
-        await peerConnection.current.addIceCandidate(
-          data.candidate
-        );
+        if(peerConnection.current){
 
-        console.log("🧊 ICE ADDED");
+          await peerConnection.current.addIceCandidate(
+            data.candidate
+          );
+
+          console.log("🧊 ICE ADDED");
+    
+        } else {
+ 
+          console.log("⏳ QUEUED ICE");
+
+          iceCandidateQueue.push(data.candidate);
+
+        }
 
       } catch(error){
 
