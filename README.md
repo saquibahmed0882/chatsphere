@@ -52,6 +52,19 @@ A modern <b>Full Stack Real-Time Chat Application</b> inspired by <b>iMessage</b
 - ⚡ Fast and Responsive WhatsApp-Style UI
 - 🍃 MongoDB Atlas Database Integration
 
+### 💬 Real-Time Communication
+- ⚡ Instant messaging with Socket.IO
+- 🟢 Real-time online/offline user presence
+- ✍️ Live typing indicator
+
+### 📁 Media Sharing
+- 📎 File sharing support for images, documents, and other media files
+
+### 📞 WebRTC Calling
+- 🎧 Peer-to-peer audio calling using WebRTC
+- 🎥 Peer-to-peer video calling with real-time streaming
+- 🔒 Direct browser-to-browser communication without external media servers
+
 ---
 
 ## 🚀 Live Demo
