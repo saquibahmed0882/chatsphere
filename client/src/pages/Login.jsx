@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API = import.meta.env.VITE_API_URL;
+
 function Login() {
 
   const navigate = useNavigate();
@@ -25,7 +27,7 @@ function Login() {
     try {
 
       const res = await fetch(
-        "http://localhost:8000/api/auth/login",
+        `${API}/api/auth/login`,
         {
           method: "POST",
           headers: {
