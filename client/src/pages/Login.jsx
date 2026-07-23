@@ -25,7 +25,7 @@ function Login() {
     try {
 
       const res = await fetch(
-        "https://chatsphere-backend-518s.onrender.com/api/auth/login",
+        "http://localhost:8000/api/auth/login",
         {
           method: "POST",
           headers: {
@@ -47,7 +47,10 @@ function Login() {
 
         localStorage.setItem(
           "user",
-          JSON.stringify(data.user)
+          JSON.stringify({
+            ...data.user,
+            id: data.user._id
+          })
         );
 
 
