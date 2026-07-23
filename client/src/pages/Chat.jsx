@@ -41,6 +41,8 @@ const [callActive, setCallActive] = useState(false);
 const localStream = useRef(null);
 const peerConnection = useRef(null);
 const remoteAudio = useRef(null);
+const localVideo = useRef(null);
+const remoteVideo = useRef(null);
 
 
 const messagesEndRef = useRef(null);
@@ -150,11 +152,16 @@ useEffect(() => {
 
 
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true
+        audio: true,
+        video: true
       });
 
 
       localStream.current = stream;
+
+    if(localVideo.current){
+      localVideo.current.srcObject = stream;
+    }
 
 
       peerConnection.current = new RTCPeerConnection({
@@ -193,6 +200,13 @@ useEffect(() => {
             event.streams[0];
 
           remoteAudio.current.play();
+
+        }
+
+        if(remoteVideo.current){
+
+          remoteVideo.current.srcObject =
+            event.streams[0];
 
         }
 
@@ -344,10 +358,15 @@ const startVoiceCall = async () => {
   try {
 
     const stream = await navigator.mediaDevices.getUserMedia({
-      audio: true
+      audio: true,
+        video: true
     });
 
     localStream.current = stream;
+
+    if(localVideo.current){
+      localVideo.current.srcObject = stream;
+    }
 
 
     peerConnection.current = new RTCPeerConnection({
@@ -486,11 +505,16 @@ const startCall = async (type) => {
 
 
   const stream = await navigator.mediaDevices.getUserMedia({
-    audio: true
+    audio: true,
+        video: true
   });
 
 
   localStream.current = stream;
+
+    if(localVideo.current){
+      localVideo.current.srcObject = stream;
+    }
 
 
   peerConnection.current = new RTCPeerConnection({
@@ -713,6 +737,19 @@ return (
   <audio
     ref={remoteAudio}
     autoPlay
+  />
+
+  <video
+    ref={localVideo}
+    autoPlay
+    muted
+    className="w-40 rounded"
+  />
+
+  <video
+    ref={remoteVideo}
+    autoPlay
+    className="w-80 rounded"
   />
 
   {incomingCall && (
