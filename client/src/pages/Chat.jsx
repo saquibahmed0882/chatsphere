@@ -249,9 +249,11 @@ useEffect(() => {
     
     const currentUser = JSON.parse(localStorage.getItem("user"));
 
+    console.log("LOCAL STORAGE USER:", currentUser);
+
     if (currentUser && socket.connected) {
 
-      console.log("MANUAL JOIN:", currentUser.id);
+      console.log("JOINING WITH ID:", currentUser.id);
 
       socket.emit("join", currentUser.id);
 
@@ -310,6 +312,8 @@ useEffect(() => {
 
 
     socket.on("onlineUsers", (users) => {
+
+      console.log("🔥 ONLINE USERS FROM SERVER:", users);
 
       setOnlineUsers(users);
 
@@ -533,7 +537,7 @@ const startCall = async (type) => {
 
     receiverId: selectedUser._id,
 
-    callerId: user.id,
+    callerId: user._id,
 
     offer
 
@@ -605,7 +609,7 @@ const handleFileUpload = async (file) => {
   const user = JSON.parse(localStorage.getItem("user"));
 
   const newMessage = {
-    sender: user.id,
+    sender: user._id,
     receiver: selectedUser._id,
     text: "",
     fileUrl: `${API}/${data.file.path}`,

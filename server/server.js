@@ -76,6 +76,9 @@ io.on("connection", (socket) => {
 
     console.log("ONLINE UPDATE RESULT:", updatedUser);
 
+    console.log("JOIN USER ID:", userId);
+    console.log("ONLINE USERS:", [...onlineUsers]);
+
     io.emit("onlineUsers", [...onlineUsers]);
 
     console.log("👤 User Joined Room:", userId);
@@ -118,6 +121,8 @@ io.on("connection", (socket) => {
       "receiveMessage",
       populatedMessage
     );
+
+    console.log("📤 SENT TO RECEIVER ROOM:", message.receiver);
 
     io.to(message.sender).emit(
       "receiveMessage",

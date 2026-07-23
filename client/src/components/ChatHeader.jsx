@@ -2,7 +2,7 @@ import { FaPhoneAlt, FaVideo, FaEllipsisV } from "react-icons/fa";
 
 function ChatHeader({ selectedUser, onlineUsers, startCall}) {
   const isOnline =
-    selectedUser && onlineUsers.includes(selectedUser._id);
+    selectedUser && onlineUsers.includes(String(selectedUser._id));
 
   return (
     <div className="h-20 bg-[#0f172a] border-b border-slate-700 flex items-center justify-between px-6">

@@ -23,19 +23,34 @@ function Sidebar({
 
       <div className="flex-1 overflow-y-auto">
 
-        {users.map((user) => (
-          <UserCard
-            key={user._id}
-            user={user}
-            selectedUser={selectedUser}
-            setSelectedUser={setSelectedUser}
-            online={onlineUsers.includes(user._id)}
-          />
-        ))}
+        {users.map((user) => {
+
+          console.log(
+            "SIDEBAR USER:",
+            user.name,
+            user._id,
+            user.id,
+            onlineUsers
+          );
+
+          return (
+            <UserCard
+              key={user._id}
+              user={user}
+              selectedUser={selectedUser}
+              setSelectedUser={setSelectedUser}
+              online={
+                onlineUsers.includes(user._id) ||
+                onlineUsers.includes(user.id)
+              }
+            />
+          );
+
+        })}
 
       </div>
-    </div>
-  );
-}
+      </div>
+      );
+      }
 
-export default Sidebar;
+      export default Sidebar;
