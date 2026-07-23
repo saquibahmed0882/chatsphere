@@ -14,6 +14,7 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const Message = require("./models/Message");
+const User = require("./models/User");
 
 const app = express();
 
@@ -59,13 +60,21 @@ io.on("connection", (socket) => {
   console.log("🟢 User Connected:", socket.id);
 
 
-  socket.on("join", (userId) => {
+  socket.on("join", async (userId) => {
 
     socket.join(userId);
 
     onlineUsers.add(userId);
 
     socket.userId = userId;
+ 
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { isOnline: true },
+      { new: true }
+    );
+
+    console.log("ONLINE UPDATE RESULT:", updatedUser);
 
     io.emit("onlineUsers", [...onlineUsers]);
 
@@ -186,19 +195,92 @@ socket.on("deleteMessage", async (messageId) => {
 
 });
 
-  socket.on("disconnect", () => {
+socket.on("disconnect", async () => {
 
-    if (socket.userId) {
-      onlineUsers.delete(socket.userId);
-      io.emit("onlineUsers", [...onlineUsers]);
-    }
+  if (socket.userId) {
+    onlineUsers.delete(socket.userId);
+    
+    await User.findByIdAndUpdate(
+      socket.userId,
+      { isOnline: false }
+    );
 
-    console.log("🔴 User Disconnected:", socket.id);
+    io.emit("onlineUsers", [...onlineUsers]);
+  }
 
+  console.log("🔴 User Disconnected:", socket.id);
+
+});
+
+
+socket.on("call-user", (data) => {
+
+  console.log("📞 CALL REQUEST:", data);
+
+  io.to(data.receiverId).emit("incoming-call", {
+    callerId: data.callerId,
+    callerName: data.callerName,
+    callType: data.callType
   });
 
 });
 
+socket.on("accept-call", (data) => {
+
+  console.log("✅ CALL ACCEPTED:", data);
+
+  io.to(data.callerId).emit("call-accepted");
+
+});
+
+socket.on("reject-call", (data) => {
+
+  console.log("❌ CALL REJECTED:", data);
+
+  io.to(data.callerId).emit("call-rejected");
+
+});
+
+socket.on("end-call", (data) => {
+
+  console.log("📴 CALL ENDED:", data);
+
+  io.to(data.receiverId).emit("call-ended");
+
+});
+
+socket.on("offer", (data) => {
+
+  console.log("📡 OFFER RECEIVED:", data);
+
+  io.to(data.receiverId).emit("offer", {
+    offer: data.offer,
+    callerId: data.callerId
+  });
+
+});
+
+socket.on("answer", (data) => {
+
+  console.log("📡 ANSWER RECEIVED:", data);
+
+  io.to(data.receiverId).emit("answer", {
+    answer: data.answer
+  });
+
+});
+
+socket.on("ice-candidate", (data) => {
+
+  console.log("🧊 ICE CANDIDATE");
+
+  io.to(data.receiverId).emit("ice-candidate", {
+    candidate: data.candidate
+  });
+
+});
+
+});
 
 connectDB();
 
@@ -237,85 +319,8 @@ const PORT = process.env.PORT || 8000;
 
 
 server.listen(PORT, () => {
-
   console.log(`Server running on http://localhost:${PORT}`);
-
-
-// 📞 WebRTC Call Signaling
-
-socket.on("call-user", (data) => {
-
-  console.log("📞 CALL REQUEST:", data);
-
-  io.to(data.receiverId).emit("incoming-call", {
-    callerId: data.callerId,
-    callerName: data.callerName,
-    callType: data.callType
-  });
-
 });
 
-
-socket.on("accept-call", (data) => {
-
-  console.log("✅ CALL ACCEPTED:", data);
-
-  io.to(data.callerId).emit("call-accepted");
-
-});
-
-
-socket.on("reject-call", (data) => {
-
-  console.log("❌ CALL REJECTED:", data);
-
-  io.to(data.callerId).emit("call-rejected");
-
-});
-
-
-socket.on("end-call", (data)=>{
-
-  console.log("📴 CALL ENDED:", data);
-
-  io.to(data.receiverId).emit("call-ended");
-
-});
-
-socket.on("offer", (data) => {
-
-  console.log("📡 OFFER RECEIVED:", data);
-
-  io.to(data.receiverId).emit("offer", {
-    offer: data.offer,
-    callerId: data.callerId
-  });
-
-});
-
-
-socket.on("answer", (data) => {
-
-  console.log("📡 ANSWER RECEIVED:", data);
-
-  io.to(data.receiverId).emit("answer", {
-    answer: data.answer
-  });
-
-});
-
-
-socket.on("ice-candidate", (data) => {
-
-  console.log("🧊 ICE CANDIDATE");
-
-  io.to(data.receiverId).emit("ice-candidate", {
-    candidate: data.candidate
-  });
-
-});
-
-
-});
 
 module.exports = io;
